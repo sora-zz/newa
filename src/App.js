@@ -12,11 +12,12 @@ function App() {
   return (
       <Routes>
         <Route path="/" element={<Navigate to={"/home"} replace />}></Route>
+        {/* <Route path="/user-manage" element={<Navigate to={"/user-manage/list"} replace />}></Route> */}
         <Route exact path={'/'} element={<NewsBox />}>
           <Route path={'/home'} element={<Home />} />
-          <Route path={'/userlist'} element={<UserList />} />
-          <Route path={'/rolelist'} element={<RoleList />} />
-          <Route path={'/rightlist'} element={<RightList />} />
+          <Route path={'/user-manage/list'} element={<UserList />} />
+          <Route path={'/right-manage/role/list'} element={<RoleList />} />
+          <Route path={'//right-manage/right/list'} element={<RightList />} />
         </Route>
         <Route exact path={'/login'} element={<Login />}></Route>
         <Route exact path={'*'} element={<NoPermission />}></Route>
