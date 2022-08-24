@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
-import { Space, Table, Tag, Button, Tooltip, Modal } from 'antd';
+import React, { useState,useEffect } from 'react'
+import { Space, Table, Tag, Button, Tooltip, Modal, Popover, Switch } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined
 } from '@ant-design/icons';
-import { useEffect } from 'react';
 import axios from 'axios';
 
 function RightList() {
@@ -17,7 +16,7 @@ function RightList() {
     setIsModalVisible(true);
   };
 
-  const [delData, setdelData] = useState('')
+  const [delData, setdelData] = useState()
 
   const getItem = (i) => {
     setdelData(i)
@@ -26,39 +25,65 @@ function RightList() {
 
   const handleOk = () => {
     setIsModalVisible(false);
-    console.log(delData);
-    setdata(data.filter(item => item.id !== delData.id ))
+    if (delData.grade == 1) {
+      axios.delete(`/rights/${delData.id}`)
+      dataSrc()
+    } else {
+      axios.delete(`/children/${delData.id}`)
+      dataSrc()
+    }
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
-  useEffect(() => {
-    axios.get('http://localhost:3006/rights?_embed=children').then(
+  const dataSrc = () => {
+    axios.get('/rights?_embed=children').then(
       res => {
         const rightsData = res.data
-        rightsData[0].children = ''
-        setdata(rightsData);
+        rightsData.forEach(element => {
+          if (element.children.length == 0) {
+            element.children = ''
+          }
+        });
+        setdata(rightsData)
       }
     )
-  }, [])
+  };
+
+
+  useEffect(() => {
+    dataSrc()
+  }, []);
+
+  const switchHandler = (item) => {
+    item.pagepermisson = item.pagepermisson == 1 ? 0 : 1
+    if (item.grade == 1) {
+      axios.patch(`/rights/${item.id}`, {
+        pagepermisson: item.pagepermisson
+      })
+      dataSrc()
+    } else {
+      axios.patch(`/children/${item.id}`, {
+        pagepermisson: item.pagepermisson
+      })
+      dataSrc()
+    };
+  }
 
   const columns = [
     {
       title: 'ID',
       dataIndex: 'id',
-      key: 'id',
       render: (text) => <a>{text}</a>,
     },
     {
       title: '权限名称',
       dataIndex: 'title',
-      key: 'title',
     },
     {
       title: '权限路径',
-      key: 'key',
       dataIndex: 'key',
       render: (_, { key }) => (
         <>
@@ -83,22 +108,22 @@ function RightList() {
             <p>确定删除此权限吗？</p>
           </Modal>
           <Tooltip >
-            <Button shape="circle" icon={<EditOutlined />} />
+            <Popover content={
+              <div style={{ textAlign: 'center' }}>
+                <Switch checked={item.pagepermisson} onClick={() => switchHandler(item)} />
+              </div>
+            } title="导航配置项" trigger={item.pagepermisson === undefined ? '' : "click"}>
+              <Button type="primary" shape="circle" icon={<EditOutlined />}
+                disabled={item.pagepermisson === undefined} />
+            </Popover>
           </Tooltip>
         </Space>
       ),
     },
   ];
-  // const data = [
-  //   {
-  //     id: '1',
-  //     title: 32,
-  //     key: ['nice'],
-  //   },
-  // ];
 
   return (
-    <Table columns={columns} dataSource={data} pagination={{ pageSize: 3 }} />
+    <Table columns={columns} dataSource={data} />
   )
 }
 

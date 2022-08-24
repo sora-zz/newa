@@ -11,18 +11,10 @@ import {
 } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import axios from 'axios';
-const { Sider } = Layout;
-// const items = [
-//   getItem('首页 ', '/home', <HomeOutlined />),
-//   getItem('用户管理', 'sub1', <TeamOutlined />, [
-//     getItem('用户列表', '/userlist'),                    
-//   ]),
-//   getItem('权限管理', 'sub2', <FormOutlined />, [
-//     getItem('角色列表', '/rolelist'), 
-//     getItem('权限列表', '/rightlist')
-//   ])
-// ];
+import store from '../redux/store'
 
+
+const { Sider } = Layout;
 const iconList = {
   '/home': <HomeOutlined />,
   '/user-manage': <TeamOutlined />,
@@ -51,15 +43,22 @@ function getItem(label, key, icon, children) {
 
 function SideMenu() {
 
-  const [isCollapsed] = useState(false);
   const [menu, setMenu] = useState([])
   const nav = useNavigate()
   const current = useLocation()
+  const user = localStorage.getItem('token')
+  const { roleId, role: { rights } } = JSON.parse(user)
+  const [flag, setFlag] = useState()
+
+  store.subscribe(() =>{
+    for( var collapse in store.getState()){
+      setFlag(store.getState()[collapse]) 
+    }
+  })
 
   useEffect(() => {
-    axios.get('http://localhost:3006/rights?_embed=children').then(
+    axios.get('/rights?_embed=children').then(
       res => {
-        // console.log(res.data);
         setMenu(res.data)
       }
     )
@@ -67,36 +66,39 @@ function SideMenu() {
 
   const items = menu.map(data => {
 
-    if (data.children.length == 0) {
+    if (roleId === 1 ? true : rights.includes(data.key)) {
 
-      return getItem1(data.title, data.key, iconList[data.key])
-
-    } else {
-
-      let child = []
-      data.children.map((item => {
-
-        if (item.pagepermisson) {
-          child.push(getItem(item.title, item.key))
+      if (data.children.length == 0) {
+        if (data.pagepermisson == 1) {
+          return getItem1(data.title, data.key, iconList[data.key])
         }
+      } else {
 
-      }))
-      return getItem(data.title, data.key, iconList[data.key], child)
+        let child = []
+        data.children.map((item => {
+
+          if (item.pagepermisson) {
+            child.push(getItem(item.title, item.key))
+          }
+
+        }))
+        return getItem(data.title, data.key, iconList[data.key], child)
+      }
     }
-
   })
 
   return (
-    <Sider trigger={null} collapsible collapsed={isCollapsed} style={{overflow: 'auto',
-    height: '100vh',
-   }}>   
-        <div className="logo">新闻发布管理系统</div>
-        <Menu  theme="dark" defaultSelectedKeys={current.pathname} mode="inline" items={items} 
-        defaultOpenKeys={['/'+current.pathname.split('/')[1]]}
-          onClick={(item) => {
-            nav(item.key)
-          }}
-        />
+    <Sider trigger={null} collapsible collapsed={flag} style={{
+      overflow: 'auto',
+      height: '100vh',
+    }}>
+      <div className="logo">新闻发布管理系统</div>
+      <Menu theme="dark" defaultSelectedKeys={current.pathname} mode="inline" items={items}
+        defaultOpenKeys={['/' + current.pathname.split('/')[1]]}
+        onClick={(item) => {
+          nav(item.key)
+        }}
+      />
     </Sider>
   )
 }
