@@ -1,0 +1,27 @@
+/* .ant-form-item-label label{
+  color:white
+} */
+
+#basic .ant-form-item .ant-form-item-row .ant-form-item-required{
+  color:white
+}
+
+.ant-checkbox-wrapper span{
+  color:white
+}
+
+.ant-checkbox-wrapper:last-child{
+  width: 100px;
+}
+
+#basic{
+  display:flex;
+  flex-flow:column;
+  padding-top: 40px;
+}
+
+.title{
+  color: white;
+  font-size: 30px;
+  padding-top: 40px;
+}

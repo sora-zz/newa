@@ -1,0 +1,23 @@
+.ant-layout-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.icon{
+  font-size: 25px;
+  padding: 16px;
+}
+
+.right{
+  display: inline;
+  padding-right: 16px;
+}
+
+.welcome,.hoverme{
+  font-size: 18px;
+}
+
+.welcome{
+  padding-right: 10px;
+}
