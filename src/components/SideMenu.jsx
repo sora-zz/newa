@@ -50,10 +50,8 @@ function SideMenu() {
   const { roleId, role: { rights } } = JSON.parse(user)
   const [flag, setFlag] = useState()
 
-  store.subscribe(() =>{
-    for( var collapse in store.getState()){
-      setFlag(store.getState()[collapse]) 
-    }
+  store.subscribe(() => {
+    setFlag(store.getState()['collapseReceduer'])
   })
 
   useEffect(() => {

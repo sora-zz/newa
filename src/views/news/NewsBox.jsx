@@ -13,10 +13,7 @@ function NewsBox() {
   const [flag, setflag] = useState()
 
   store.subscribe(() => {
-
-    for( var loading in store.getState()){
-      setflag(store.getState()[loading]) 
-    }
+    setflag(store.getState()['loadingReceduer'])
   })
 
 
