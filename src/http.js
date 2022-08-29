@@ -3,7 +3,6 @@ import store from './redux/store'
 
 axios.defaults.baseURL = 'http://localhost:3006'
 
-// 添加请求拦截器
 axios.interceptors.request.use(function (config) {
   store.dispatch({ type: 'loading',payload:true })
   return config;

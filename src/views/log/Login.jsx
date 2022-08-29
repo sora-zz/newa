@@ -3,6 +3,7 @@ import { Button, Checkbox, Form, Input, message } from 'antd';
 import './Login.css'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import store from '../../redux/store'
 
 function Login() {
 
@@ -15,6 +16,7 @@ function Login() {
           message.error('用户名或密码错误')
         } else {
           localStorage.setItem('token', JSON.stringify(res.data[0]))
+          store.dispatch({ type: 'token',payload:true })
           nav('/')
         }
       }
@@ -46,10 +48,6 @@ function Login() {
           }}
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
-          // autoComplete="off"
-          // initialValues={{
-          //   modifier: 'public',
-          // }}
         >
           <Form.Item style={{ width: '80%' }}
             label="用户名"

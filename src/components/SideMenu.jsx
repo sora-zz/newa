@@ -92,7 +92,7 @@ function SideMenu() {
     }}>
       <div className="logo">新闻发布管理系统</div>
       <Menu theme="dark" defaultSelectedKeys={current.pathname} mode="inline" items={items}
-        defaultOpenKeys={['/' + current.pathname.split('/')[1]]}
+        defaultOpenKeys={['/' + current.pathname.split('/')[1]]} 
         onClick={(item) => {
           nav(item.key)
         }}

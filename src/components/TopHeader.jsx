@@ -36,6 +36,7 @@ function TopHeader() {
             <span onClick={() => {
               nav('/login')
               localStorage.removeItem('token')
+              store.dispatch({ type: 'token',payload:null })
             }}>
               退出登录
             </span>
@@ -60,7 +61,7 @@ function TopHeader() {
         }} />
       }
       <div className='right'>
-        <span className='welcome' >欢迎 <span style={{ color: '#1890ff' }}>{username}</span>回来</span>
+        <span className='welcome'>欢迎 <span style={{ color: '#1890ff' }}>{username}</span> 回来</span>
         <Dropdown overlay={menu}>
           <Avatar size={40} icon={<UserOutlined />} />
         </Dropdown>

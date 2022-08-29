@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import React, { useState, useEffect } from 'react'
-import 'antd/dist/antd.css'
+import 'antd/dist/antd.min.css'
 import Home from './views/home/Home';
 import Login from './views/log/Login';
 import NewsBox from './views/news/NewsBox';
@@ -19,6 +19,7 @@ import PublishedNews from './views/published/PublishedNews';
 import SunsetNews from './views/sunset/SunsetNews';
 import axios from 'axios';
 import UpdateNews from './views/draft/UpdateNews';
+import store from './redux/store'
 
 function Router() {
 
@@ -32,8 +33,8 @@ function Router() {
     '/news-manage/add': <WriteNews />,
     '/news-manage/draft': <DraftBox />,
     '/news-manage/category': <NewsCategory />,
-    '/news-manage/preview/:id':<Preview/>,
-    '/news-manage/update/:id':<UpdateNews/>,
+    '/news-manage/preview/:id': <Preview />,
+    '/news-manage/update/:id': <UpdateNews />,
     '/audit-manage/audit': <AuditNews />,
     '/audit-manage/list': <AuditList />,
     '/publish-manage/unpublished': <UnpublishedNews />,
@@ -52,40 +53,55 @@ function Router() {
     )
   }, [])
 
-  const user = localStorage.getItem('token')
+  const [tokenflag, setokenflag] = useState()
 
-  const { roleId,role: { rights } } = JSON.parse(user)
+  store.subscribe(() => {
+    setokenflag(store.getState()['tokenReceduer'])
+  })
+
+  const [user, setuser] = useState(null)
+
+  useEffect(() => {
+    setuser( localStorage.getItem('token'))
+  },[tokenflag])
+
+  const { roleId, role: { rights } } = JSON.parse(user) || {roleId:null,role:{rights:null}}
 
   const flag1 = (item) => {
-    return ((item.pagepermisson || item.routepermisson) && routerMap[item.key])
+    if (user) {
+      return ((item.pagepermisson || item.routepermisson) && routerMap[item.key])
+    }else{
+      return false
+    }
   }
 
   const flag2 = (item) => {
-    if (roleId == 1) {
-      return rights.checked.includes(item.key)
-    } else {
-      return rights.includes(item.key)
+    if(user){
+      if (roleId && roleId == 1) {
+        return rights.checked.includes(item.key)
+      } else {
+        return rights.includes(item.key)
+      }
+    }else{
+      return false
     }
-  }　　
-
+    
+  }
 
   return (
     <Routes>
       <Route path={'/'} element={<Navigate to={"/home"} replace />}></Route>
       <Route exact path={'/login'} element={<Login />}></Route>
       <Route exact path={'*'} element={<NoPermission />}></Route>
+
       <Route exact path={'/'} element={<NewsBox />}>
         {backRouter.map(item => {
           if (flag1(item) && flag2(item)) {
             return <Route path={item.key} element={routerMap[item.key]} key={item.id} exact />
           }
         })}
-
-        {/* <Route path={'/home'} element={<Home />} />
-        <Route path={'/user-manage/list'} element={<UserList />} />
-        <Route path={'/right-manage/role/list'} element={<RoleList />} />
-        <Route path={'/right-manage/right/list'} element={<RightList />} /> */}
       </Route>
+      
     </Routes>
   );
 }
